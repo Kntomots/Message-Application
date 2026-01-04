@@ -1,4 +1,4 @@
-# Diktya - TCP/IP Messaging Application
+# TCP/IP Messaging Application
 
 A Java-based network messaging system that allows multiple clients to communicate with each other through a central server using TCP/IP sockets.
 
