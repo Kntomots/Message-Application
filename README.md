@@ -22,15 +22,20 @@ diktya/
 │   ├── Client.java           # Client application for user interaction
 │   ├── ClientHandler.java    # Handles individual client connections and requests
 │   ├── Account.java          # User account model with messages
-│   └── Message.java          # Message model
+│   ├── Message.java          # Message model
+│   ├── MessagingApp.java     # GUI application entry point (Swing)
+│   ├── LoginFrame.java       # Login UI window
+│   ├── ChatFrame.java        # Main chat UI window
+│   └── ClientConnection.java # Socket connection handler for GUI
 ├── README.md
 └── diktya.iml
 ```
 
 ## Requirements
 
-- **Java Development Kit (JDK) 11** or higher
-- **Java Runtime Environment (JRE)** for running compiled classes
+- **Java Development Kit (JDK) 8** or higher
+- **Java Runtime Environment (JRE) 8** or higher for running compiled classes
+- **No external dependencies** - Uses only built-in Java Swing library
 
 ## Setup Instructions
 
@@ -43,51 +48,55 @@ cd diktya
 
 ### 2. Compile the Project
 
-Navigate to the `src` directory and compile all Java files:
+Navigate to the `src` directory and compile all Java files with Java 8 compatibility:
 
 ```bash
 cd src
-javac *.java
-```
-
-Or if Java 11 is not in your PATH:
-
-```bash
-C:\Program Files\Java\jdk-11\bin\javac.exe *.java
+javac -source 1.8 -target 1.8 *.java
 ```
 
 ## Running the Application
 
-### Step 1: Start the Server
+### Option 1: Using the GUI (Recommended for Users)
 
-Open a PowerShell/Command Prompt terminal and run:
+#### Step 1: Start the Server
+
+Open a PowerShell/Command Prompt terminal:
 
 ```bash
 cd src
-java -cp . Server 5000
+java Server 5000
 ```
 
-Or with full Java 11 path:
+#### Step 2: Launch the GUI Application
+
+Open a **new** PowerShell/Command Prompt terminal:
 
 ```bash
-& 'C:\Program Files\Java\jdk-11\bin\java.exe' -cp . Server 5000
+cd src
+java MessagingApp
 ```
 
-The server will start listening on **port 5000**. You should see no output if it starts successfully.
+A login window will appear. Enter:
+- **Host:** `localhost`
+- **Port:** `5000`
+- **Username:** Your username
+- Click **Login**
 
-### Step 2: Start the Client
+Features:
+- Clean, intuitive interface
+- Contact list dropdown
+- Real-time messaging
+- Message history (shows all messages with selected contact)
+- Refresh contacts button
+
+### Option 2: Using Command-Line Client (For Automation/Testing)
 
 Open a **new** PowerShell/Command Prompt terminal and run:
 
 ```bash
 cd src
-java -cp . Client localhost 5000 <operation> <arguments>
-```
-
-Or with full Java 11 path:
-
-```bash
-& 'C:\Program Files\Java\jdk-11\bin\java.exe' -cp . Client localhost 5000 <operation> <arguments>
+java Client localhost 5000 <operation> <arguments>
 ```
 
 ## Client Operations
@@ -204,75 +213,101 @@ java -cp . Client localhost 5000 6 6851 1
 
 ---
 
-## Example Workflow
+## Example Workflow with GUI
 
 1. **Terminal 1 - Start Server:**
 
    ```bash
-   java -cp . Server 5000
+   cd src
+   java Server 5000
+   ```
+
+2. **Terminal 2 - Launch GUI Application:**
+
+   ```bash
+   cd src
+   java MessagingApp
+   ```
+
+3. **In the Login Window:**
+   - Host: `localhost`
+   - Port: `5000`
+   - Username: `alice`
+   - Click **Login**
+
+4. **In the Chat Window:**
+   - Click **Refresh** to load contacts
+   - Select a contact from the dropdown
+   - Type a message in the input field
+   - Press **Enter** or click **Send**
+   - View message history in the chat area
+
+5. **Multiple Users:**
+   - Open another instance: `java MessagingApp` in a new terminal
+   - Login with different credentials
+   - Both windows will show contacts and can exchange messages in real-time
+
+## Example Workflow with Command-Line Client
+
+1. **Terminal 1 - Start Server:**
+
+   ```bash
+   java Server 5000
    ```
 2. **Terminal 2 - Register User 1:**
 
    ```bash
-   java -cp . Client localhost 5000 1 alice
-   # Output: 1234 (your auth token)
+   java Client localhost 5000 1 alice
+   # Output: Success (or your auth response)
    ```
-3. **Terminal 3 - Register User 2:**
+3. **Terminal 3 - Register User 2:**your Java installation:
 
-   ```bash
-   java -cp . Client localhost 5000 1 bob
-   # Output: 5678 (your auth token)
-   ```
-4. **Terminal 2 - List all users (as alice):**
+```bash
+C:\Program Files\Java\jdk1.8.0_361\bin\javac.exe *.java
+```
 
-   ```bash
-   java -cp . Client localhost 5000 2 1234
-   # Output: 1. alice, 2. bob
-   ```
-5. **Terminal 3 - Send message to alice (as bob):**
+### Issue: GUI Window Doesn't Appear
 
-   ```bash
-   java -cp . Client localhost 5000 3 5678 alice Hi alice how are you
-   # Output: OK
-   ```
-6. **Terminal 2 - Check unread messages (as alice):**
+**Solution:** Make sure the server is running first. Check that:
+1. Server is started in another terminal: `java Server 5000`
+2. Port 5000 is not in use
+3. Firewall is not blocking the connection
 
-   ```bash
-   java -cp . Client localhost 5000 4 1234
-   # Output: 1. from: bob*
-   ```
-7. **Terminal 2 - Read message 1 (as alice):**
+### Issue: "UnsupportedClassVersionError"
 
-   ```bash
-   java -cp . Client localhost 5000 5 1234 1
-   # Output: (bob)Hi alice how are you
-   ```
+**Solution:** Recompile with Java 8 compatibility:
 
 ## Troubleshooting
 
 ### Issue: "javac is not recognized"
 
-**Solution:** Add Java to your PATH or use the full path to Java 11:
+**Solution:** Add Java to your PATH or use the full path to your Java installation:
 
 ```bash
-C:\Program Files\Java\jdk-11\bin\javac.exe *.java
+C:\Program Files\Java\jdk1.8.0_361\bin\javac.exe *.java
 ```
 
-### Issue: "Could not find or load main class Server"
+### Issue: GUI Window Doesn't Appear
 
-**Solution:** Make sure you've compiled the files and are in the `src` directory with the `-cp .` flag
+**Solution:** Make sure the server is running first. Check that:
+1. Server is started in another terminal: `java Server 5000`
+2. Port 5000 is not in use
+3. Firewall is not blocking the connection
 
 ### Issue: "UnsupportedClassVersionError"
 
-**Solution:** Use Java 11 to run the application:
+**Solution:** Recompile with Java 8 compatibility:
 
 ```bash
-& 'C:\Program Files\Java\jdk-11\bin\java.exe' -cp . Server 5000
+javac -source 1.8 -target 1.8 *.java
 ```
 
 ### Issue: "Connection refused"
 
-**Solution:** Make sure the server is running in another terminal before starting the client
+**Solution:** 
+1. Make sure the server is running: `java Server 5000`
+2. Verify port number matches (should be 5000)
+3. Check host address (use `localhost` for local testing)
 
 ## Architecture
 
@@ -280,14 +315,20 @@ C:\Program Files\Java\jdk-11\bin\javac.exe *.java
 - **ClientHandler.java**: Processes client requests and manages the protocol logic
 - **Account.java**: Stores user account data (username, auth token, messages)
 - **Message.java**: Represents a single message with sender, receiver, body, and read status
-- **Client.java**: User-facing application that connects to the server
+- **Client.java**: Command-line user interface for testing
+- **MessagingApp.java**: Swing GUI application entry point
+- **LoginFrame.java**: Swing login window UI
+- **ChatFrame.java**: Swing chat window UI
+- **ClientConnection.java**: Socket communication handler for the GUI
 
 ## Notes
 
-- All authentication tokens are randomly generated 4-digit numbers (1000-9999)
 - Messages are stored in memory only (no database persistence)
 - The server runs indefinitely until terminated
-- Multiple clients can connect and interact simultaneously
+- Multiple clients (GUI and command-line) can connect and interact simultaneously
+- GUI provides real-time messaging with contact list and message history
+- Command-line client is useful for scripting and automation testing
+- All authentication tokens are randomly generated 4-digit numbers (1000-9999)
 
 ## Author
 
